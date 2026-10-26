@@ -1,19 +1,18 @@
 [project]
-name = "qec"
+name = "qec-optimal-recovery"
 version = "0.1.0"
-description = "Quantum error correction experiments"
+description = "Petz vs. SDP-optimal recovery for the LNCY code under amplitude damping"
 requires-python = ">=3.10"
 dependencies = ["numpy", "scipy", "matplotlib", "cvxpy"]
 
 [project.optional-dependencies]
 dev = ["pytest", "jupyter"]
 
+# setuptools picks up every module in src/ automatically (src-layout discovery)
 [build-system]
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-where = ["src"]
-
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]

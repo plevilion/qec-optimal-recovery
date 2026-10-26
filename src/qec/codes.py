@@ -30,3 +30,6 @@ def leung_isometry() -> np.ndarray:
     zero_L /= np.linalg.norm(zero_L)
     one_L /= np.linalg.norm(one_L)
     return np.column_stack([zero_L, one_L])
+
+def code_projector(V: np.ndarray) -> np.ndarray:
+    return V @ V.conj().T

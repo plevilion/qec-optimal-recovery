@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from qec.codes import basis_states
+from qec.codes import basis_states, leung_isometry
 
 
 def test_bit_flip_code_corrects_single_error():
@@ -34,3 +34,22 @@ def test_basis_states_are_orthonormal():
 def test_rejects_invalid_bit_strings(bad):
     with pytest.raises(ValueError):
         basis_states(bad)
+
+
+def test_leung_isometry_codewords():
+    V = leung_isometry()
+    assert V.shape == (16, 2)
+    s = 1 / np.sqrt(2)
+    zero_L, one_L = np.zeros(16), np.zeros(16)
+    zero_L[[0b0000, 0b1111]] = s
+    one_L[[0b0011, 0b1100]] = s
+    np.testing.assert_allclose(V[:, 0], zero_L)
+    np.testing.assert_allclose(V[:, 1], one_L)
+
+
+def test_leung_isometry_is_isometry():
+    V = leung_isometry()
+    np.testing.assert_allclose(V.conj().T @ V, np.eye(2), atol=1e-12)
+    P = V @ V.conj().T
+    np.testing.assert_allclose(P @ P, P, atol=1e-12)
+    assert np.isclose(np.trace(P), 2)

@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from qec.codes import basis_states, leung_isometry
+from qec.codes import basis_states, leung_isometry, code_projector
 
 
 def test_bit_flip_code_corrects_single_error():

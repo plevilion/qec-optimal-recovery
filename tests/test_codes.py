@@ -50,6 +50,33 @@ def test_leung_isometry_codewords():
 def test_leung_isometry_is_isometry():
     V = leung_isometry()
     np.testing.assert_allclose(V.conj().T @ V, np.eye(2), atol=1e-12)
-    P = V @ V.conj().T
-    np.testing.assert_allclose(P @ P, P, atol=1e-12)
+
+
+@pytest.fixture
+def P():
+    return code_projector(leung_isometry())
+
+
+def test_code_projector_has_trace_two(P):
     assert np.isclose(np.trace(P), 2)
+
+
+def test_code_projector_is_idempotent(P):
+    np.testing.assert_allclose(P @ P, P, atol=1e-12)
+
+
+def test_code_projector_is_hermitian(P):
+    np.testing.assert_allclose(P, P.conj().T, atol=1e-12)
+
+
+@pytest.mark.parametrize(
+    "logical, support",
+    [(0, ["0000", "1111"]), (1, ["0011", "1100"])],
+)
+def test_encoding_has_expected_nonzero_components(logical, support):
+    ket = np.eye(2)[logical]
+    encoded = leung_isometry() @ ket
+    nonzero = {format(i, "04b") for i in np.flatnonzero(~np.isclose(encoded, 0))}
+    assert nonzero == set(support)
+    for bits in support:
+        assert np.isclose(encoded[int(bits, 2)], 1 / np.sqrt(2))

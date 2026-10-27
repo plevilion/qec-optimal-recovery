@@ -80,3 +80,9 @@ def test_encoding_has_expected_nonzero_components(logical, support):
     assert nonzero == set(support)
     for bits in support:
         assert np.isclose(encoded[int(bits, 2)], 1 / np.sqrt(2))
+
+
+
+
+
+    

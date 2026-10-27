@@ -81,7 +81,7 @@ Recovery performance is measured through entanglement fidelity:
 $$
 F_e(\mathcal R\circ\Phi_\gamma)=
 \langle\Phi^+|
-(\operatorname{id}\otimes\mathcal R\circ\Phi_\gamma)
+(I\otimes\mathcal R\circ\Phi_\gamma)
 (|\Phi^+\rangle\langle\Phi^+|)
 |\Phi^+\rangle,
 $$

@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from channels import noisy_kraus_operator, encoded_noisy_channel
-from codes import basis_states, leung_isometry, code_projector
+from codes import basis_states, leung_isometry, code_projector, ket_to_rho
 
 
 GAMMAS =[0.0, 0.001, 0.1, 0.32, 0.67, 1.0]
@@ -15,6 +15,7 @@ def test_noisy_kraus_preserves_trace(gamma):
 
 
 def rand_rho(dim=2, rng=None):
+    # creates a random density matrix 
     if rng is None:
         rng = np.random.default_rng(1234)
 
@@ -23,8 +24,6 @@ def rand_rho(dim=2, rng=None):
     rho = M @ M.conj().T
     return rho / np.trace(rho)
 
-def ket_to_rho(psi):
-    return np.outer(psi, psi.conj())
 
 RHOS = [ket_to_rho(np.array([1,0])), ket_to_rho(np.array([0,1])), ket_to_rho(np.array([1/np.sqrt(2), 1/np.sqrt(2)])), np.eye(2)/2, rand_rho()]
 

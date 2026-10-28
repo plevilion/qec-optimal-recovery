@@ -18,6 +18,9 @@ def basis_states(bits: str) -> np.ndarray:
     state[int(bits, 2)] = 1
     return state
 
+def ket_to_rho(psi):
+    return np.outer(psi, psi.conj())
+
 
 def leung_isometry() -> np.ndarray:
     """Return the 16x2 encoding isometry V = |0_L><0| + |1_L><1| of the Leung code.

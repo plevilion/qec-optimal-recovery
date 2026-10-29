@@ -22,6 +22,17 @@ def ket_to_rho(psi):
     return np.outer(psi, psi.conj())
 
 
+def rand_rho(dim=2, rng=None):
+    # creates a random density matrix 
+    if rng is None:
+        rng = np.random.default_rng(1234)
+
+    M = rng.normal(size=(dim, dim)) + 1j * rng.normal(size=(dim, dim))
+
+    rho = M @ M.conj().T
+    return rho / np.trace(rho)
+
+
 def leung_isometry() -> np.ndarray:
     """Return the 16x2 encoding isometry V = |0_L><0| + |1_L><1| of the Leung code.
 

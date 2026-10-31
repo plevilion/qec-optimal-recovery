@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from petz import petz_kraus, support_projector
+from petz import petz_kraus, support_projector, completed_petz_kraus
 from channels import encoded_noisy_channel, noisy_kraus_operator
 from codes import rand_rho, leung_isometry
 from fidelity import entanglement_fidelity
@@ -74,3 +74,11 @@ def test_recovery_fidelity(gamma):
         assert np.isclose(F, 1.0, atol=1e-12)
     if gamma == 1.0:
         assert np.isclose(F, 0.25, atol=1e-12)
+
+
+
+
+@pytest.mark.parametrize("gamma", GAMMAS)
+def test_completed_petz_is_trace_preserving(gamma):
+    R = completed_petz_kraus(np.eye(2)/2, gamma)
+    np.testing.assert_allclose(sum(K.conj().T @ K for K in R), np.eye(16), atol=1e-8)

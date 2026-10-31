@@ -40,4 +40,16 @@ def petz_kraus(sigma, gamma):
     tau = encoded_noisy_channel(sigma, gamma)
     sqrt_sigma = psd_sqrt(sigma)
     inv_sqrt_tau = pseudo_inv_sqrt(tau)
-    return np.array([sqrt_sigma @ E[i].conj().T @ inv_sqrt_tau for i in range(len(E))])
+    return [sqrt_sigma @ E[i].conj().T @ inv_sqrt_tau for i in range(len(E))]
+
+
+
+
+def completed_petz_kraus(sigma, gamma, tol=1e-12):
+   
+    tau = encoded_noisy_channel(sigma, gamma)
+    w, U = np.linalg.eigh(tau)
+    q = U[:, w <= tol]          # orthonormal basis of the complement of the support (empty if tau is full rank)
+    S_0 = [np.outer(np.array([1, 0]), q[:, k].conj()) / np.sqrt(2) for k in range(q.shape[1])]
+    S_1 = [np.outer(np.array([0, 1]), q[:, k].conj()) / np.sqrt(2) for k in range(q.shape[1])]
+    return petz_kraus(sigma, gamma) + S_0 + S_1

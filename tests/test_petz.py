@@ -50,10 +50,10 @@ def test_recovery(gamma):
 def test_noiseless_recovery(rho):
 
     # testing if the completed Petz maps recovers initial when there is no noise, i.e. gamma = 0
-    
-    tau = encoded_noisy_channel(rho, 0.0)
-    R = petz_kraus(rho, 0)
-    recov = sum(R[k]@tau@R[k].conj().T for k in range(len(R))) + np.trace((np.eye(16)-support_projector(tau))@tau)*np.eye(2)/2
+
+    R = completed_petz_kraus(np.eye(2)/2, 0.0)
+    V = leung_isometry()
+    recov = sum(r @ V @ rho @ V.conj().T @ r.conj().T for r in R)
     np.testing.assert_allclose(recov, rho, atol=1e-12)
 
 

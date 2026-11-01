@@ -86,7 +86,7 @@ $$
 For a channel with Kraus operators $\{K_i\}$ on a $d$-dimensional input this reduces to
 
 $$
-F_e = \frac{1}{d^2}\sum_i \big|\mathrm{Tr}(\K_i)\big|^2 ,
+F_e = \frac{1}{d^2}\sum_i \big|\mathrm{Tr}(K_i)\big|^2 ,
 $$
 
 which is what `src/fidelity.py` computes ($d = 2$). As a reference, a single unencoded qubit under amplitude damping has $F_e = (1+\sqrt{1-\gamma})^2/4$.

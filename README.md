@@ -86,7 +86,7 @@ $$
 For a channel with Kraus operators $\{K_i\}$ on a $d$-dimensional input this reduces to
 
 $$
-F_e = \frac{1}{d^2}\sum_i \big|\mathrm{Tr}\K_i\big|^2 ,
+F_e = \frac{1}{d^2}\sum_i \big|\mathrm{Tr}(\K_i)\big|^2 ,
 $$
 
 which is what `src/fidelity.py` computes ($d = 2$). As a reference, a single unencoded qubit under amplitude damping has $F_e = (1+\sqrt{1-\gamma})^2/4$.
@@ -115,7 +115,7 @@ $$
 R_b = \sigma^{1/2} E_b^\dagger \tau^{-1/2}.
 $$
 
-$\tau$ is not full rank, so $\tau^{-1/2}$ is a pseudo-inverse (taken on the support of $\tau$). The map above is then only trace-preserving on $\mathrm{supp}(\tau)$, so it is completed on the kernel of $\tau$ by outputting $I/2$, exactly as in the baseline. Implemented in `src/petz.py` (`petz_kraus`, `completed_petz_kraus`).
+$\tau$ is not always full rank ($\gamma = 0, 1$), so $\tau^{-1/2}$ is a pseudo-inverse (taken on the support of $\tau$). The map above is then only trace-preserving on $\mathrm{supp}(\tau)$, so it is completed on the kernel of $\tau$ by outputting $I/2$, exactly as in the baseline. Implemented in `src/petz.py` (`petz_kraus`, `completed_petz_kraus`).
 
 ### SDP-optimal recovery
 
@@ -128,16 +128,16 @@ $$
 The entanglement fidelity is linear in $J$:
 
 $$
-F_e(\mathcal R\circ\Phi_\gamma) = \mathrm{Tr}(C_{gamma}J_{\mathcal R}),
+F_e(\mathcal R\circ\Phi_\gamma) = \mathrm{Tr}(C_{\gamma}J_{\mathcal R}),
 \qquad
-C_{gamma} = \frac14\sum_{i,j=0}^{1} \Phi_\gamma\big(|i\rangle\langle j|\big)^{T} \otimes \big(|i\rangle\langle j|\big)^{T},
+C_{\gamma} = \frac14\sum_{i,j=0}^{1} \Phi_\gamma\big(|i\rangle\langle j|\big)^{T} \otimes \big(|i\rangle\langle j|\big)^{T},
 $$
 
 so the best recovery is the solution of the SDP
 
 $$
 \boxed{
-\max_{J}\ \mathrm{Tr}(C_{gamma}J_{\mathcal R})
+\max_{J}\ \mathrm{Tr}(C_{\gamma}J_{\mathcal R})
 \quad\text{subject to}\quad
 J_{\mathcal R} \succeq 0,
 \qquad
@@ -145,7 +145,7 @@ J_{\mathcal R} \succeq 0,
 }
 $$
 
-where $J_{\mathcal R} \succeq 0$ means $\mathcal R$ is completely positive and $\mathrm{Tr}_{\text{out}} J_{\mathcal R} = I_{16}$ means it is trace-preserving. Implemented with CVXPY in `src/sdp.py` (`objective_matrix`, `optimal_recovery`). As a check, building the Choi matrix of the Petz map and evaluating $\mathrm{Tr}(C_{gamma}J_{\mathcal R})$ reproduces the Petz fidelity computed from Kraus operators (`tests/test_sdp.py`).
+where $J_{\mathcal R} \succeq 0$ means $\mathcal R$ is completely positive and $`\mathrm{Tr}_{\text{out}} J_{\mathcal R} = I_{16}`$ means it is trace-preserving. Implemented with CVXPY in `src/sdp.py` (`objective_matrix`, `optimal_recovery`). As a check, building the Choi matrix of the Petz map and evaluating $\mathrm{Tr}(C_{\gamma}J_{\mathcal R})$ reproduces the Petz fidelity computed from Kraus operators (`tests/test_sdp.py`).
 
 ## 4. Numerical Results
 
@@ -234,7 +234,7 @@ The 137 tests check, among other things, that $V$ is an isometry, that the noise
 jupyter nbconvert --to notebook --execute --inplace notebooks/petz_vs_baseline.ipynb notebooks/optimal_decoder.ipynb
 ```
 
-This reruns both notebooks (about 10 s in total) and regenerates every plot inside them. The images in `figures/` were exported from these plots: `petz_vs_baseline.png` from `petz_vs_baseline.ipynb`, and `optimal_sdp_fidelity.png` and `petz_optimality_gap.png` from `optimal_decoder.ipynb`. `data/fidelities.csv` holds the values plotted in `optimal_decoder.ipynb`.
+This reruns both notebooks (about 10 s in total) and regenerates every plot inside them. Running it also rewrites `figures/petz_vs_baseline.png`, `figures/opti_sdp_fidelity.png`, `figures/petz_optimality_gap.png` and `data/fidelities.csv`.
 
 ### Solver and numerical tolerances
 

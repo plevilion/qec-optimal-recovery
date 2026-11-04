@@ -48,19 +48,20 @@ The Petz recovery map is built from a model of the noise. What happens when this
 \[
 F(\gamma,r\gamma)=1-\Big[\tfrac74-\Big(1-\tfrac1{\sqrt2}\Big)\,r(1-r)\Big]\gamma^2+O(\gamma^3),
 \]
-so $r=\frac12$ is optimal, and any underestimate of the noise ($0<r<1$) beats the matched map. The proof rests on two structural facts. First, $236$ of the $256$ traces entering the fidelity vanish identically. Second, the first-order terms cancel, because every Petz map with $h>0$ corrects single decays exactly at leading order.
+so $r=\frac12$ is optimal, and any underestimate of the noise ($0<r<1$) beats the matched map. 
+%The proof rests on two structural facts. First, $236$ of the $256$ traces entering the fidelity vanish identically. Second, the first-order terms cancel, because every Petz map with $h>0$ corrects single decays exactly at leading order.%
 \end{abstract}
 
 %======================================================================
 \section{Introduction}
 %======================================================================
 
-The Petz map~\cite{petz1986} is a universal recovery channel. Given a noise channel and a reference state, it provides an explicit decoder whose fidelity is close to the optimal one~\cite{barnum2002}. Its weak point is that it needs the noise channel itself. In practice a damping rate is estimated, not known, so the decoder is built for an assumed parameter $h$ while the true parameter is $\gamma$. How much fidelity does a wrong guess cost?
+The Petz map is a universal recovery channel. Given a noise channel and a reference state, it provides an explicit decoder whose fidelity is provably close to the optimal one~\cite{barnum2002}. For the Leung code under amplitude damping, our SDP computations show that it is in fact much closer than this bound guarantees: $1-F_{\mathrm{Petz}}\approx1.75\gamma^2$, against $1-F_{\mathrm{opt}}\approx1.25\gamma^2$ for the optimal recovery~\cite{fletcher2007}. Its weak point is that it needs the noise channel itself. In practice a damping rate is estimated, not known, so the decoder is built for an assumed parameter $h$ while the true parameter is $\gamma$. How much fidelity does a wrong guess cost?
 
 We study this question for the four-qubit code of Leung, Nielsen, Chuang and Yamamoto~\cite{leung1997} under independent amplitude damping. Figure~\ref{fig:numerics}(a) shows the gain of the mismatched Petz map over the matched one ($h=\gamma$). It contains two surprises:
 \begin{itemize}
   \item \emph{Underestimating the noise helps.} The gain is positive below the diagonal $h=\gamma$ and negative above it. The best assumed value $h^*(\gamma)$ satisfies $h^*/\gamma\approx0.50$ at $\gamma=10^{-3}$, and the ratio decreases to $0.26$ at $\gamma=0.3$ (Figure~\ref{fig:numerics}(b)).
-  \item \emph{Assuming no noise at all is catastrophic.} Every $h>0$, however small, gives $1-F=O(\gamma^2)$, whereas $h=0$ gives $1-F\approx\frac32\gamma$.
+  \item \emph{Assuming no noise at all is catastrophic.} Every $h>0$, however small, gives $1-F=O(\gamma^2)$, whereas at $h=0$ the Petz map reduces to the baseline recovery, with $1-F\approx\frac32\gamma$ (see the notebooks \texttt{petz\_\allowbreak vs\_\allowbreak baseline.ipynb} and \texttt{robustness.ipynb}).
 \end{itemize}
 This note explains both observations analytically in the weak-noise regime.
 
@@ -106,15 +107,14 @@ F(\gamma,h)=\frac18\sum_{k,j}T_{kj}^2,\qquad T_{kj}(\gamma,h)=\Tr\Big(E_k(h)^\da
 \begin{theorem}\label{thm:main}
 Fix $r>0$ and set $h=r\gamma$. As $\gamma\to0^+$,
 \begin{equation}\label{eq:main}
-\boxed{\;F(\gamma,r\gamma)=1-c(r)\,\gamma^2+O(\gamma^3),\qquad c(r)=\frac74-\kappa\,r(1-r),\qquad \kappa=1-\frac1{\sqrt2}\approx0.293.\;}
+\boxed{\;F(\gamma,r\gamma)=1-c(r)\,\gamma^2+O(\gamma^3),\qquad c(r)=\frac74+(1-\frac1{\sqrt2})\,r(r-1).\;}
 \end{equation}
-The remainder is uniform for $r$ in compact subsets of $(0,\infty)$.
 \end{theorem}
 
-Since $r(1-r)=\frac14-(r-\frac12)^2$, the coefficient can also be written $c(r)=\frac32+\frac{\sqrt2}8+\kappa\,(r-\frac12)^2$. This form gives the consequences for calibration.
+Since $r(1-r)=\frac14-(r-\frac12)^2$, the coefficient can also be written $c(r)=\frac32+\frac{\sqrt2}8+(1-\frac1{\sqrt2})\,(r-\frac12)^2$. This form gives the consequences for calibration.
 
 \begin{corollary}\label{cor:calibration}
-Let $c$ and $\kappa$ be as in \eqref{eq:main}.
+Let $c$ be as in \eqref{eq:main}.
 \begin{enumerate}
   \item[(a)] \emph{Matched map:} $1-F(\gamma,\gamma)=\frac74\gamma^2+O(\gamma^3)$.
   \item[(b)] \emph{Best calibration:} $c$ is minimal at $r=\frac12$, so the best Petz map is built for half the true noise, with $c(\frac12)=\frac32+\frac{\sqrt2}8\approx1.677$. Its gain over the matched map is $F(\gamma,\frac\gamma2)-F(\gamma,\gamma)=\frac{2-\sqrt2}8\gamma^2+O(\gamma^3)\approx0.073\,\gamma^2$.
@@ -124,7 +124,7 @@ Let $c$ and $\kappa$ be as in \eqref{eq:main}.
 \end{corollary}
 
 \begin{proof}
-Parts (a)--(c) follow from the two forms of $c$. For (d), let $f_\gamma(r)=(1-F(\gamma,r\gamma))/\gamma^2$. The uniform remainder gives $|f_\gamma(r)-c(r)|\le C\gamma$ on $[r_1,r_2]$. Since $r^*$ minimises $f_\gamma$, we get $\kappa(r^*-\frac12)^2=c(r^*)-c(\frac12)\le f_\gamma(r^*)-f_\gamma(\frac12)+2C\gamma\le2C\gamma$.
+Parts (a)--(c) follow from the two forms of $c$. For (d), let $f_\gamma(r)=(1-F(\gamma,r\gamma))/\gamma^2$. The uniform remainder gives $|f_\gamma(r)-c(r)|\le C\gamma$ on $[r_1,r_2]$. Since $r^*$ minimises $f_\gamma$, we get $(1-\frac1{\sqrt2})(r^*-\frac12)^2=c(r^*)-c(\frac12)\le f_\gamma(r^*)-f_\gamma(\frac12)+2C\gamma\le2C\gamma$.
 \end{proof}
 
 Note also that $\lim_{r\to0^+}c(r)=c(1)=\frac74$. At this order, a Petz map built for a vanishingly small but non-zero noise is exactly as good as the matched one.
@@ -154,7 +154,7 @@ Table~\ref{tab:columns} in the appendix lists all $32$ columns. Two features mat
 
 \subsection*{Step 2: \texorpdfstring{$\tau_h$}{tau\_h} is block diagonal}
 
-By \eqref{eq:petz}, $\bra x\tau_h\ket y=\frac12\sum_j\big(N_j(h)^\dagger\ket x\big)^\dagger\,\Pi\,\big(N_j(h)^\dagger\ket y\big)$, and $N_j^\dagger\ket x\propto\ket{x+j}$ re-excites the decayed qubits. This vector is zero unless $x$ has a $0$ wherever $j$ has a $1$. The projector $\Pi$ only couples two strings of the same $\cC_\ell$, and these two strings are complements of each other. For $x\ne y$ this forces $x+j$ and $y+j$ to be complementary. That is only possible if $j=0000$ and $y=\bar x$ with $\{x,\bar x\}=\cC_0$ or $\cC_1$. Hence, after reordering the basis,
+By \eqref{eq:petz}, $\bra x\tau_h\ket y=\frac12\sum_j\big(N_j(h)^\dagger\ket x\big)^\dagger\,\Pi\,\big(N_j(h)^\dagger\ket y\big)$, and $N_j^\dagger\ket x\propto\ket{x+j}$ re-excites the decayed qubits. This vector is zero unless $x$ has a $0$ wherever $j$ has a $1$. Then each term in the sum is proportional to $\bra{x+j} \Pi \ket{x+y}$ which is non zero when both strings are in the same $\cC_l$. For $x\ne y$ this forces $x+j$ and $y+j$ to be complementary. That is only possible if $j=0000$ and $y=\bar x$ with $\{x,\bar x\}=\cC_0$ or $\cC_1$. Hence, after reordering the basis,
 \begin{equation}\label{eq:blocks}
 \tau_h\cong B_0(h)\oplus B_1(h)\oplus\lambda_3(h)I_4\oplus\lambda_1(h)I_4\oplus\lambda_2(h)I_4 .
 \end{equation}
@@ -166,20 +166,20 @@ B_1=\frac{(1-h)^2}4\begin{pmatrix}1+h^2&1\\1&1+h^2\end{pmatrix},
 \[
 \lambda_1=\tfrac14h(1-h)(1+h^2)\ \ (\wt{x}=1),\qquad \lambda_2=\tfrac14h^2(1-h)^2\ \ (x\in\cW),\qquad \lambda_3=\tfrac14h(1-h)^3\ \ (\wt{x}=3),
 \]
-where $\cW=\{0101,0110,1001,1010\}$ are the four weight-two strings outside $\cC$. All blocks are positive definite for $0<h<1$, so $\tau_h$ is invertible. It is, however, badly conditioned: six of its eigenvalues are of order $h^2/4$. The inverse square root $\tau_h^{-1/2}$ has the same block structure, with explicit blocks given in Appendix~\ref{app:tau}.
+where $\cW=\{0101,0110,1001,1010\}$ are the four weight-two strings outside $\cC$. All blocks are positive definite for $0<h<1$, so $\tau_h$ is invertible. The inverse square root $\tau_h^{-1/2}$ has the same block structure, with explicit blocks given in Appendix~\ref{app:tau}.
 
 \subsection*{Step 3: why only 20 of the 256 traces survive}
 
-Write $\tilde e_{j,\ell}=\sqrt2\,E_j\ket\ell$ for the columns. A $2\times2$ trace is the sum of the two diagonal entries, so
+Write $\tilde e_{j,\ell}=\sqrt2\,E_j\ket\ell$ for the columns. Then,
 \begin{equation}\label{eq:trace}
 T_{kj}=\frac12\sum_{\ell\in\{0,1\}}\tilde e_{k,\ell}(h)^T\,\tau_h^{-1/2}\,\tilde e_{j,\ell}(\gamma).
 \end{equation}
 Two facts now decide which traces can be non-zero:
 \begin{enumerate}
-  \item the trace only pairs \emph{the same} logical column $\ell$ of $E_k(h)$ and $E_j(\gamma)$;
-  \item by \eqref{eq:blocks}, $\tau_h^{-1/2}$ does not mix the $14$ blocks $\cH_0$, $\cH_1$ and $\C\ket x$ ($x\notin\cC$).
+  \item the trace only pairs \emph{the same} column $\ell$ of $E_k(h)$ and $E_j(\gamma)$;
+  \item by \eqref{eq:blocks}, $\tau_h^{-1/2}$ maps each of the $14$ orthogonal subspaces $\cH_0$, $\cH_1$ and $\C\ket x$ ($x\notin\cC$) into themselves.
 \end{enumerate}
-So $T_{kj}\ne0$ requires some $\ell$ for which column $\ell$ of $E_k$ and column $\ell$ of $E_j$ lie in the same block. By Step~1, every non-zero column lies in exactly one block, as listed in Table~\ref{tab:blocks}.
+So $T_{kj}\ne0$ requires some $\ell$ for which column $\ell$ of $E_k$ and column $\ell$ of $E_j$ lie in the same subspace. By Step~1, every non-zero column lies in exactly one subspace, as listed in Table~\ref{tab:blocks}.
 
 \begin{table}[ht]
 \centering
@@ -199,24 +199,21 @@ $\C\ket x$, $x\in\cW$ & $j=\bar x$ & ---\\
 \label{tab:blocks}
 \end{table}
 
-Reading the table row by row:
+Reading the table :
 \begin{itemize}
-  \item a block $\C\ket x$ receives at most one column for each $\ell$, so it only produces diagonal traces $T_{jj}$; this gives the $12$ traces with $j\notin\cC$;
-  \item $\cH_0$ with $\ell=0$ couples $0000$ and $1111$, which gives the $4$ traces in $\cC_0\times\cC_0$;
-  \item $\cH_1$ with $\ell=0$ and $\cH_0$ with $\ell=1$ couple $0011$ and $1100$, which gives the $4$ traces in $\cC_1\times\cC_1$;
+  \item a block $\C\ket x$ receives at most one column for each $\ell$, so it only produces diagonal traces $T_{jj}$; this gives the $3\times 4=12$ traces with $j\notin\cC$;
+  \item $\cH_0$ with $\ell=0$ couples $0000$ and $1111$, which gives $4$ traces;
+  \item $\cH_1$ with $\ell=0$ and $\cH_0$ with $\ell=1$ couple $0011$ and $1100$, which gives $4$ traces;
   \item a mixed pair such as $(0000,0011)$ never meets: for $\ell=0$ its columns lie in $\cH_0$ and $\cH_1$, and for $\ell=1$ in $\cH_1$ and $\cH_0$.
 \end{itemize}
 In total $12+4+4=20$ traces survive, and the other $236$ vanish identically.
 
-\begin{keyidea}
-The Petz operator $R_k(h)$ only responds to the syndrome left by the error $k$. Different decay patterns leave orthogonal syndromes, so $R_k$ ignores $E_j$ for $j\ne k$. The only exceptions are errors that send the state back into the code support $\cC$: the no-decay operator and the double decays $0011$, $1100$, $1111$. They form the two small groups $\cC_0$ and $\cC_1$.
-\end{keyidea}
 
 \subsection*{Step 4: the twenty traces, and why single decays are corrected for every \texorpdfstring{$h>0$}{h > 0}}
 
-Each surviving trace is a product of a few coefficients from \eqref{eq:col0}--\eqref{eq:col1} with one entry of $\tau_h^{-1/2}$. For a single decay ($\wt{j}=1$) the two columns lie in the blocks $\C\ket{\bar j}$ and $\C\ket{j'}$, where $\tau_h^{-1/2}$ is multiplication by $\lambda_3(h)^{-1/2}$ and by $\lambda_1(h)^{-1/2}$. The small coefficients $\sqrt h$ of $E_j(h)$ cancel against the large factors $1/\sqrt h$ of $\tau_h^{-1/2}$:
+Each surviving trace is a product of a few coefficients from \eqref{eq:col0}--\eqref{eq:col1} with one entry of $\tau_h^{-1/2}$. For a single decay ($\wt{j}=1$) the two columns lie in the blocks $\C\ket{\bar j}$ and $\C\ket{j'}$, where $\tau_h^{-1/2}$ is multiplication by $\lambda_3(h)^{-1/2}$ and by $\lambda_1(h)^{-1/2}$. This gives:
 \begin{equation}\label{eq:cancel}
-\tfrac12\,h^{1/2}(1-h)^{3/2}\,\lambda_3(h)^{-1/2}=1,\qquad \tfrac12\,\big(h(1-h)\big)^{1/2}\lambda_1(h)^{-1/2}=(1+h^2)^{-1/2}.
+\text{for $\ell = 0$ : }\tfrac12\,h^{1/2}(1-h)^{3/2}\,\lambda_3(h)^{-1/2}=1,\qquad \text{ for $\ell = 1$ : } \tfrac12\,\big(h(1-h)\big)^{1/2}\lambda_1(h)^{-1/2}=(1+h^2)^{-1/2}.
 \end{equation}
 Therefore
 \begin{equation}\label{eq:T1}
@@ -288,7 +285,7 @@ $8F(\gamma,r\gamma)$ & $8$ & $0$ & $-14+(8-4\sqrt2)\,r(1-r)$\\
 Dividing by $8$, and using $\frac{8-4\sqrt2}8=1-\frac1{\sqrt2}=\kappa$, gives Theorem~\ref{thm:main}. As for the remainder: the factors $\sqrt\gamma$ in $T_{(1)}$ and $T_{(3)}$ only enter through their squares, so the right-hand side of \eqref{eq:Fexact} is a smooth function of $(\gamma,r)$ near $\gamma=0$. Taylor's theorem then bounds the remainder by $O(\gamma^3)$, uniformly for $r$ in compact sets.
 
 %======================================================================
-\section{Numerical verification and discussion}
+\section{Numerical verification and discussion}\label{sec:numerics}
 %======================================================================
 
 \paragraph{Leading coefficient.} Table~\ref{tab:check} compares $(1-F(\gamma,r\gamma))/\gamma^2$, computed with the function \texttt{mismatched\_\allowbreak petz\_\allowbreak fidelity}, with $c(r)$. The difference shrinks linearly in $\gamma$, as expected from the $O(\gamma^3)$ remainder. The twenty traces of Step~4 agree with a direct numerical evaluation to about $10^{-15}$, and the other $236$ vanish. Below $\gamma\approx10^{-4}$ the numerical code loses accuracy, because of the eigenvalues of order $h^2$ in $\tau_h$. The closed form \eqref{eq:Fexact}, evaluated in high precision, keeps converging to $c(r)$.
@@ -356,6 +353,8 @@ $1111$ & $\gamma^2\ket{0000}$ & $0$\\
 \section{The blocks of \texorpdfstring{$\tau_h^{-1/2}$}{the inverse square root}}\label{app:tau}
 %======================================================================
 
+Throughout, $w=\sqrt{2+h^2}$, $u=(1-h)^2+hw$ and $t=\sqrt{1+u^2}$, as in \eqref{eq:T00}.
+
 \paragraph{The $\cH_1$ block.} $B_1$ has the eigenvectors $\frac1{\sqrt2}(1,\pm1)$, with eigenvalues
 \[
 \mu_+=\tfrac14(1-h)^2(2+h^2),\qquad \mu_-=\tfrac14h^2(1-h)^2 .
@@ -371,7 +370,6 @@ B_0^{-1/2}=\frac2{s\,t}\begin{pmatrix}(1-h)^4+s&-(1-h)^2\\-(1-h)^2&(1+h^2)^2+s\e
 \]
 with $a_0=\dfrac{2u}{hwt}$, $c_0=-\dfrac2{hwt}$ and $d_0=\dfrac{2(1+hwu)}{(1-h)^2hwt}$.
 
-\paragraph{The other blocks.} On $\C\ket x$ with $x\notin\cC$, $\tau_h^{-1/2}$ is multiplication by $\lambda_1^{-1/2}$, $\lambda_2^{-1/2}$ or $\lambda_3^{-1/2}$.
 
 %======================================================================
 \section{The remaining traces}\label{app:traces}
@@ -401,7 +399,6 @@ The remainder in \eqref{eq:Fexact} is
 At $h=r\gamma$ every term of $\rho$ is of order $\gamma^4$ or smaller, since $T_{0011,1100}$, $T_{0000,1111}$ and $T_{1111,0000}$ are $O(\gamma^2)$, $T_{1111,1111}=O(\gamma^3)$ and $T_{(3)}=O(\gamma^{5/2})$.
 
 \begin{thebibliography}{9}
-\bibitem{petz1986} D.~Petz, \emph{Sufficient subalgebras and the relative entropy of states of a von Neumann algebra}, Commun. Math. Phys. \textbf{105}, 123--131 (1986).
 \bibitem{barnum2002} H.~Barnum and E.~Knill, \emph{Reversing quantum dynamics with near-optimal quantum and classical fidelity}, J. Math. Phys. \textbf{43}, 2097 (2002).
 \bibitem{leung1997} D.~W. Leung, M.~A. Nielsen, I.~L. Chuang and Y.~Yamamoto, \emph{Approximate quantum error correction can lead to better codes}, Phys. Rev. A \textbf{56}, 2567 (1997).
 \bibitem{fletcher2007} A.~S. Fletcher, P.~W. Shor and M.~Z. Win, \emph{Optimum quantum error recovery using semidefinite programming}, Phys. Rev. A \textbf{75}, 012338 (2007).

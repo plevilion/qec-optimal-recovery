@@ -7,6 +7,7 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{booktabs}
 \usepackage{graphicx}
+\usepackage{needspace}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 
 \graphicspath{{../figures/}}
@@ -15,13 +16,6 @@
 \theoremstyle{plain}
 \newtheorem{theorem}{Theorem}
 \newtheorem{corollary}[theorem]{Corollary}
-
-% framed box for the two structural ideas of the proof
-\newsavebox{\keyboxcontent}
-\newenvironment{keyidea}
-  {\par\medskip\noindent\begin{lrbox}{\keyboxcontent}%
-   \begin{minipage}{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}\textbf{Key idea.}\ }
-  {\end{minipage}\end{lrbox}\fbox{\usebox{\keyboxcontent}}\par\medskip}
 
 \newcommand{\ket}[1]{\lvert #1\rangle}
 \newcommand{\bra}[1]{\langle #1\rvert}
@@ -46,10 +40,10 @@
 \begin{abstract}
 The Petz recovery map is built from a model of the noise. What happens when this model is wrong? We study the four-qubit Leung code under amplitude damping with parameter $\gamma$, recovered by the Petz map built for an assumed parameter $h$. Numerically, the best choice is not $h=\gamma$ but a smaller value, which approaches $\gamma/2$ at weak noise. We prove that for $h=r\gamma$ with $r>0$ fixed,
 \[
-F(\gamma,r\gamma)=1-\Big[\tfrac74-\Big(1-\tfrac1{\sqrt2}\Big)\,r(1-r)\Big]\gamma^2+O(\gamma^3),
+F(\gamma,r\gamma)=1-\Big[\tfrac74+\Big(1-\tfrac1{\sqrt2}\Big)\,r(r-1)\Big]\gamma^2+O(\gamma^3),
 \]
 so $r=\frac12$ is optimal, and any underestimate of the noise ($0<r<1$) beats the matched map. 
-%The proof rests on two structural facts. First, $236$ of the $256$ traces entering the fidelity vanish identically. Second, the first-order terms cancel, because every Petz map with $h>0$ corrects single decays exactly at leading order.%
+
 \end{abstract}
 
 %======================================================================
@@ -58,12 +52,7 @@ so $r=\frac12$ is optimal, and any underestimate of the noise ($0<r<1$) beats th
 
 The Petz map is a universal recovery channel. Given a noise channel and a reference state, it provides an explicit decoder whose fidelity is provably close to the optimal one~\cite{barnum2002}. For the Leung code under amplitude damping, our SDP computations show that it is in fact much closer than this bound guarantees: $1-F_{\mathrm{Petz}}\approx1.75\gamma^2$, against $1-F_{\mathrm{opt}}\approx1.25\gamma^2$ for the optimal recovery~\cite{fletcher2007}. Its weak point is that it needs the noise channel itself. In practice a damping rate is estimated, not known, so the decoder is built for an assumed parameter $h$ while the true parameter is $\gamma$. How much fidelity does a wrong guess cost?
 
-We study this question for the four-qubit code of Leung, Nielsen, Chuang and Yamamoto~\cite{leung1997} under independent amplitude damping. Figure~\ref{fig:numerics}(a) shows the gain of the mismatched Petz map over the matched one ($h=\gamma$). It contains two surprises:
-\begin{itemize}
-  \item \emph{Underestimating the noise helps.} The gain is positive below the diagonal $h=\gamma$ and negative above it. The best assumed value $h^*(\gamma)$ satisfies $h^*/\gamma\approx0.50$ at $\gamma=10^{-3}$, and the ratio decreases to $0.26$ at $\gamma=0.3$ (Figure~\ref{fig:numerics}(b)).
-  \item \emph{Assuming no noise at all is catastrophic.} Every $h>0$, however small, gives $1-F=O(\gamma^2)$, whereas at $h=0$ the Petz map reduces to the baseline recovery, with $1-F\approx\frac32\gamma$ (see the notebooks \texttt{petz\_\allowbreak vs\_\allowbreak baseline.ipynb} and \texttt{robustness.ipynb}).
-\end{itemize}
-This note explains both observations analytically in the weak-noise regime.
+We study this question for the four-qubit code of Leung, Nielsen, Chuang and Yamamoto~\cite{leung1997} under independent amplitude damping. This setting was also investigated by Burri \cite{burri2026}, who compared the performance of Petz recovery with other decoding strategies, including SDP-optimal recovery. Figure~\ref{fig:numerics} illustrates a counterintuitive observation: a Petz recovery map constructed for an underestimated damping parameter can outperform the map constructed for the true noise. Figure~\ref{fig:numerics}(a) shows that the fidelity gain is positive below the diagonal $h=\gamma$ and negative above it, while Figure~\ref{fig:numerics}(b) shows that the optimal assumed parameter $h^*(\gamma)$ is systematically smaller than $\gamma$. In particular, the ratio $h^*(\gamma)/\gamma$ approaches $1/2$ in the weak-noise limit. This note provides an analytical explanation of this phenomenon in the weak-noise regime.
 
 \begin{figure}[t]
 \centering
@@ -107,17 +96,17 @@ F(\gamma,h)=\frac18\sum_{k,j}T_{kj}^2,\qquad T_{kj}(\gamma,h)=\Tr\Big(E_k(h)^\da
 \begin{theorem}\label{thm:main}
 Fix $r>0$ and set $h=r\gamma$. As $\gamma\to0^+$,
 \begin{equation}\label{eq:main}
-\boxed{\;F(\gamma,r\gamma)=1-c(r)\,\gamma^2+O(\gamma^3),\qquad c(r)=\frac74+(1-\frac1{\sqrt2})\,r(r-1).\;}
+\boxed{\;F(\gamma,r\gamma)=1-c(r)\,\gamma^2+O(\gamma^3),\qquad c(r)=\frac74+\Big(1-\frac1{\sqrt2}\Big)\,r(r-1).\;}
 \end{equation}
 \end{theorem}
 
-Since $r(1-r)=\frac14-(r-\frac12)^2$, the coefficient can also be written $c(r)=\frac32+\frac{\sqrt2}8+(1-\frac1{\sqrt2})\,(r-\frac12)^2$. This form gives the consequences for calibration.
+Since $r(r-1)=(r-\frac12)^2-\frac14$, the coefficient can also be written $c(r)=\frac32+\frac{\sqrt2}8+(1-\frac1{\sqrt2})\,(r-\frac12)^2$. This form gives the consequences for calibration.
 
 \begin{corollary}\label{cor:calibration}
 Let $c$ be as in \eqref{eq:main}.
 \begin{enumerate}
   \item[(a)] \emph{Matched map:} $1-F(\gamma,\gamma)=\frac74\gamma^2+O(\gamma^3)$.
-  \item[(b)] \emph{Best calibration:} $c$ is minimal at $r=\frac12$, so the best Petz map is built for half the true noise, with $c(\frac12)=\frac32+\frac{\sqrt2}8\approx1.677$. Its gain over the matched map is $F(\gamma,\frac\gamma2)-F(\gamma,\gamma)=\frac{2-\sqrt2}8\gamma^2+O(\gamma^3)\approx0.073\,\gamma^2$.
+  \item[(b)] \emph{Best calibration:} among Petz recoveries calibrated with $h=r\gamma$ for fixed $r>0$, the leading-order infidelity is minimised at $r=\frac12$, with $c(\frac12)=\frac32+\frac{\sqrt2}8\approx1.677$. The gain of this calibration over the matched map is $F(\gamma,\frac\gamma2)-F(\gamma,\gamma)=\frac{2-\sqrt2}8\gamma^2+O(\gamma^3)\approx0.073\,\gamma^2$.
   \item[(c)] \emph{Sign of the error:} $c(r)<c(1)$ if and only if $0<r<1$. At leading order, any underestimate of the noise helps and any overestimate hurts, which is the sign pattern of Figure~\ref{fig:numerics}(a).
   \item[(d)] \emph{Optimal ratio:} if $0<r_1<\frac12<r_2$, every maximiser $r^*(\gamma)$ of $r\mapsto F(\gamma,r\gamma)$ on $[r_1,r_2]$ satisfies $|r^*(\gamma)-\frac12|=O(\sqrt\gamma)$.
 \end{enumerate}
@@ -133,7 +122,7 @@ Note also that $\lim_{r\to0^+}c(r)=c(1)=\frac74$. At this order, a Petz map buil
 \section{Proof outline}\label{sec:proof}
 %======================================================================
 
-The proof is a direct computation, organised so that most of the $256$ traces in \eqref{eq:F} never need to be computed. The detailed matrices are collected in the appendix. All formulas below were checked symbolically and against the numerical code.
+The proof is a direct computation, organised so that most of the $256$ traces in \eqref{eq:F} never need to be computed. The detailed matrices are collected in the appendix. 
 
 \subsection*{Step 1: each Kraus column is a single basis vector, except for no decay}
 
@@ -154,7 +143,7 @@ Table~\ref{tab:columns} in the appendix lists all $32$ columns. Two features mat
 
 \subsection*{Step 2: \texorpdfstring{$\tau_h$}{tau\_h} is block diagonal}
 
-By \eqref{eq:petz}, $\bra x\tau_h\ket y=\frac12\sum_j\big(N_j(h)^\dagger\ket x\big)^\dagger\,\Pi\,\big(N_j(h)^\dagger\ket y\big)$, and $N_j^\dagger\ket x\propto\ket{x+j}$ re-excites the decayed qubits. This vector is zero unless $x$ has a $0$ wherever $j$ has a $1$. Then each term in the sum is proportional to $\bra{x+j} \Pi \ket{x+y}$ which is non zero when both strings are in the same $\cC_l$. For $x\ne y$ this forces $x+j$ and $y+j$ to be complementary. That is only possible if $j=0000$ and $y=\bar x$ with $\{x,\bar x\}=\cC_0$ or $\cC_1$. Hence, after reordering the basis,
+By \eqref{eq:petz}, $\bra x\tau_h\ket y=\frac12\sum_j\big(N_j(h)^\dagger\ket x\big)^\dagger\,\Pi\,\big(N_j(h)^\dagger\ket y\big)$, and $N_j^\dagger\ket x\propto\ket{x+j}$ re-excites the decayed qubits. This vector is zero unless $x$ has a $0$ wherever $j$ has a $1$. Then each term in the sum is proportional to $\bra{x+j}\Pi\ket{y+j}$, which is non-zero only when both strings lie in the same $\cC_0$ or $\cC_1$. For $x\ne y$ this forces $x+j$ and $y+j$ to be complementary. That is only possible if $j=0000$ and $y=\bar x$ with $\{x,\bar x\}=\cC_0$ or $\cC_1$. Hence, after reordering the basis,
 \begin{equation}\label{eq:blocks}
 \tau_h\cong B_0(h)\oplus B_1(h)\oplus\lambda_3(h)I_4\oplus\lambda_1(h)I_4\oplus\lambda_2(h)I_4 .
 \end{equation}
@@ -199,7 +188,7 @@ $\C\ket x$, $x\in\cW$ & $j=\bar x$ & ---\\
 \label{tab:blocks}
 \end{table}
 
-Reading the table :
+Reading the table:
 \begin{itemize}
   \item a block $\C\ket x$ receives at most one column for each $\ell$, so it only produces diagonal traces $T_{jj}$; this gives the $3\times 4=12$ traces with $j\notin\cC$;
   \item $\cH_0$ with $\ell=0$ couples $0000$ and $1111$, which gives $4$ traces;
@@ -209,17 +198,20 @@ Reading the table :
 In total $12+4+4=20$ traces survive, and the other $236$ vanish identically.
 
 
-\subsection*{Step 4: the twenty traces, and why single decays are corrected for every \texorpdfstring{$h>0$}{h > 0}}
+\subsection*{Step 4: the twenty traces}
 
 Each surviving trace is a product of a few coefficients from \eqref{eq:col0}--\eqref{eq:col1} with one entry of $\tau_h^{-1/2}$. For a single decay ($\wt{j}=1$) the two columns lie in the blocks $\C\ket{\bar j}$ and $\C\ket{j'}$, where $\tau_h^{-1/2}$ is multiplication by $\lambda_3(h)^{-1/2}$ and by $\lambda_1(h)^{-1/2}$. This gives:
 \begin{equation}\label{eq:cancel}
-\text{for $\ell = 0$ : }\tfrac12\,h^{1/2}(1-h)^{3/2}\,\lambda_3(h)^{-1/2}=1,\qquad \text{ for $\ell = 1$ : } \tfrac12\,\big(h(1-h)\big)^{1/2}\lambda_1(h)^{-1/2}=(1+h^2)^{-1/2}.
+\begin{aligned}
+&\text{for $\ell=0$:} && \tfrac12\,h^{1/2}(1-h)^{3/2}\,\lambda_3(h)^{-1/2}=1,\\
+&\text{for $\ell=1$:} && \tfrac12\,\big(h(1-h)\big)^{1/2}\,\lambda_1(h)^{-1/2}=(1+h^2)^{-1/2}.
+\end{aligned}
 \end{equation}
 Therefore
 \begin{equation}\label{eq:T1}
 T_{(1)}:=T_{jj}=\sqrt{\gamma(1-\gamma)}\,\Big[(1-\gamma)+\frac1{\sqrt{1+h^2}}\Big]\qquad(\wt{j}=1).
 \end{equation}
-At leading order this does not depend on $h$ at all: on the syndromes of a single decay, $R_j(h)$ acts as the ideal correction, whatever $h>0$. The other diagonal traces are $T_{(\cW)}=\gamma(1-\gamma)$ for $j\in\cW$ and $T_{(3)}=h\gamma^{3/2}(1-\gamma)^{1/2}(1+h^2)^{-1/2}$ for $\wt{j}=3$. The no-decay trace involves both $B_0^{-1/2}$ and $B_1^{-1/2}$:
+The other diagonal traces are $T_{(\cW)}=\gamma(1-\gamma)$ for $j\in\cW$ and $T_{(3)}=h\gamma^{3/2}(1-\gamma)^{1/2}(1+h^2)^{-1/2}$ for $\wt{j}=3$. The no-decay trace involves both $B_0^{-1/2}$ and $B_1^{-1/2}$:
 \begin{equation}\label{eq:T00}
 T_{0000,0000}=\frac{1+(1-\gamma)^2u}{t}+\frac{2(1-\gamma)}w,
 \end{equation}
@@ -238,9 +230,6 @@ T_{0000,0000}^2=8-16\gamma+O(\gamma^2),\qquad 4T_{(1)}^2=16\gamma+O(\gamma^2),
 \]
 and all other terms of \eqref{eq:Fexact} are $O(\gamma^2)$. The two first-order terms cancel exactly, for every $r>0$.
 
-\begin{keyidea}
-Even when no decay happens, the state loses amplitude: $E_{0000}$ shrinks $\ket{1111}$, $\ket{0011}$ and $\ket{1100}$. So the no-decay branch carries only the fraction $\frac12\Tr E_{0000}^\dagger E_{0000}=1-2\gamma+O(\gamma^2)$ of the total weight, and the missing $2\gamma$ sits in the four single-decay branches. By \eqref{eq:cancel}, the Petz map returns all of it to the code space, for any $h>0$. Nothing is lost at first order, so $r$ can only appear at order $\gamma^2$.
-\end{keyidea}
 
 \subsection*{Step 6: where the coefficient \texorpdfstring{$c(r)$}{c(r)} comes from}
 
@@ -260,7 +249,7 @@ where the terms linear in $h$ cancel inside the bracket. This gives
 \begin{equation}\label{eq:T00exp}
 T_{0000,0000}=2\sqrt2-2\sqrt2\,\gamma+\Big[\frac{\sqrt2}2+\underbrace{(\sqrt2-1)\,r}_{\text{cross term }\gamma\cdot h}\ \underbrace{-\,(\sqrt2-1)\,r^2}_{\text{terms in }h^2}\Big]\gamma^2+O(\gamma^3).
 \end{equation}
-The term linear in $r$ is a cross term: it pairs the true deformation $(1-\gamma)^2\approx1-2\gamma$ of the codeword $\ket{0_L}$ with the first-order dependence of the map on $h$, and it rewards building the map for a larger $h$. The term in $r^2$ is a pure $h^2$ effect of the map itself and penalises a large $h$. The two coefficients are equal and opposite. This produces $r(1-r)$, which is maximal at $r=\frac12$ and takes the same value as $r\to0^+$ and at $r=1$. Squaring \eqref{eq:T00exp} and collecting all contributions to \eqref{eq:Fexact} gives Table~\ref{tab:collect}.
+Squaring \eqref{eq:T00exp} and collecting all contributions to \eqref{eq:Fexact} gives Table~\ref{tab:collect}.
 
 \begin{table}[ht]
 \centering
@@ -282,13 +271,13 @@ $8F(\gamma,r\gamma)$ & $8$ & $0$ & $-14+(8-4\sqrt2)\,r(1-r)$\\
 \label{tab:collect}
 \end{table}
 
-Dividing by $8$, and using $\frac{8-4\sqrt2}8=1-\frac1{\sqrt2}=\kappa$, gives Theorem~\ref{thm:main}. As for the remainder: the factors $\sqrt\gamma$ in $T_{(1)}$ and $T_{(3)}$ only enter through their squares, so the right-hand side of \eqref{eq:Fexact} is a smooth function of $(\gamma,r)$ near $\gamma=0$. Taylor's theorem then bounds the remainder by $O(\gamma^3)$, uniformly for $r$ in compact sets.
+Dividing by $8$, and using $\frac{8-4\sqrt2}8=1-\frac1{\sqrt2}$, gives Theorem~\ref{thm:main}. As for the remainder: the factors $\sqrt\gamma$ in $T_{(1)}$ and $T_{(3)}$ only enter through their squares, so the right-hand side of \eqref{eq:Fexact} is a smooth function of $(\gamma,r)$ near $\gamma=0$. Taylor's theorem then bounds the remainder by $O(\gamma^3)$, uniformly for $r$ in compact sets.
 
 %======================================================================
 \section{Numerical verification and discussion}\label{sec:numerics}
 %======================================================================
 
-\paragraph{Leading coefficient.} Table~\ref{tab:check} compares $(1-F(\gamma,r\gamma))/\gamma^2$, computed with the function \texttt{mismatched\_\allowbreak petz\_\allowbreak fidelity}, with $c(r)$. The difference shrinks linearly in $\gamma$, as expected from the $O(\gamma^3)$ remainder. The twenty traces of Step~4 agree with a direct numerical evaluation to about $10^{-15}$, and the other $236$ vanish. Below $\gamma\approx10^{-4}$ the numerical code loses accuracy, because of the eigenvalues of order $h^2$ in $\tau_h$. The closed form \eqref{eq:Fexact}, evaluated in high precision, keeps converging to $c(r)$.
+\paragraph{Leading coefficient.} Table~\ref{tab:check} compares $(1-F(\gamma,r\gamma))/\gamma^2$, computed with the function \texttt{mismatched\_\allowbreak petz\_\allowbreak fidelity}, with $c(r)$. The difference shrinks linearly in $\gamma$, as expected from the $O(\gamma^3)$ remainder. Below $\gamma\approx10^{-4}$ the numerical code loses accuracy, because of the eigenvalues of order $h^2$ in $\tau_h$.
 
 \begin{table}[ht]
 \centering
@@ -307,21 +296,15 @@ $2$ & $2.5087$ & $2.3580$ & $2.3380$ & $2.3358$\\
 \label{tab:check}
 \end{table}
 
-\paragraph{Optimal calibration.} The optimiser \texttt{optimal\_\allowbreak petz\_\allowbreak calibration} gives $h^*/\gamma=0.497$ at $\gamma=10^{-3}$ and $0.482$ at $\gamma=10^{-2}$, approaching $\frac12$ (Figure~\ref{fig:numerics}(b)). At $\gamma=10^{-3}$ the gain over the matched map is $7.39\times10^{-8}$, against $\frac{2-\sqrt2}8\gamma^2=7.32\times10^{-8}$. At larger $\gamma$ higher orders take over: the optimal ratio drops to $0.37$ at $\gamma=0.1$ and $0.26$ at $\gamma=0.3$, and the gain exceeds the $\gamma^2$ prediction ($1.37\times10^{-3}$ against $0.73\times10^{-3}$ at $\gamma=0.1$).
+\paragraph{Optimal calibration.} The optimiser \texttt{optimal\_\allowbreak petz\_\allowbreak calibration} gives $h^*/\gamma=0.497$ at $\gamma=10^{-3}$ and $0.482$ at $\gamma=10^{-2}$, approaching $\frac12$ (Figure~\ref{fig:numerics}(b)). At $\gamma=10^{-3}$ the gain over the matched map is $7.39\times10^{-8}$, against $\frac{2-\sqrt2}8\gamma^2=7.32\times10^{-8}$. At larger $\gamma$ higher orders take over: the optimal ratio drops to $0.37$ at $\gamma=0.1$ and $0.26$ at $\gamma=0.3$.
 
-\paragraph{Comparison with optimal recovery.} The SDP-optimal recovery~\cite{fletcher2007} gives $(1-F_{\mathrm{opt}})/\gamma^2\approx1.250$ for $\gamma\le0.05$ (\texttt{data/fidelities.csv}). At weak noise, the best calibration therefore closes only $(c(1)-c(\frac12))/(c(1)-1.25)\approx15\%$ of the gap between the matched Petz map and the optimum. It helps more at stronger noise: at $\gamma=0.3$ it raises $F$ from $0.849$ to $0.867$, against $F_{\mathrm{opt}}=0.890$, which closes $44\%$ of the gap. The constant $1.25$ is a numerical observation, not part of the theorem.
+\paragraph{The singular case $h=0$.} An interesting feature of the Petz recovery is its discontinuous behaviour at $h=0$. For every fixed $r>0$, choosing $h=r\gamma$ gives $1-F(\gamma,r\gamma)=O(\gamma^2)$ as $\gamma\to0^+$. In contrast, setting $h=0$ reduces the completed Petz map to the baseline recovery, for which $1-F(\gamma,0)=\frac32\gamma+O(\gamma^2)$. This distinction arises because $\tau_h$ is full rank for $h>0$ but has rank two at $h=0$.
 
-\paragraph{The singular point $h=0$.} Theorem~\ref{thm:main} gives $c(0^+)=\frac74$, yet the map used at $h=0$ is much worse. The formulas of Step~4 are continuous at $h=0$, so
-\[
-F(\gamma,0^+)=\lim_{h\to0^+}F(\gamma,h)=1-\tfrac74\gamma^2+\tfrac34\gamma^3+\tfrac14\gamma^4 .
-\]
-For the baseline map $\cR_0$, the trace $\Tr V^\dagger E_j(\gamma)$ is non-zero only for $j=0000$ and $j=1111$, and the completion contributes $\frac18\sum_{j,\ell}\|(I-\Pi)E_j\ket\ell\|^2$. This gives
-\[
-F(\gamma,0)=1-\tfrac32\gamma+\gamma^2-\tfrac14\gamma^3,\qquad F(\gamma,0^+)-F(\gamma,0)=\tfrac\gamma4(1-\gamma)^2(6+\gamma).
-\]
-The reason for the jump is the cancellation \eqref{eq:cancel}. For every $h>0$, the single-decay syndromes lie in the support of $\tau_h$, with weight of order $h$, and the Petz map rescales them by $h^{-1/2}$, recovering them fully. At $h=0$ they lie outside the support. The completion then replaces these branches by the maximally mixed state, which keeps only $\frac14$ of their weight $2\gamma$ in the fidelity, so $\frac32\gamma$ is lost. Numerically, $F(0.1,0)=0.85975$ while $F(0.1,10^{-4})=0.98328$, close to $F(0.1,0^+)=0.983275$. The limits do not commute: $\lim_{r\to0^+}\lim_{\gamma\to0^+}(1-F)/\gamma^2=\frac74$, whereas $(1-F(\gamma,0))/\gamma^2\to\infty$.
+\paragraph{Comparison with optimal recovery.} The SDP-optimal recovery gives $(1-F_{\mathrm{opt}})/\gamma^2\approx1.250$ for $\gamma\le0.05$ (\texttt{data/fidelities.csv}). At weak noise, the best calibration therefore closes only $(c(1)-c(\frac12))/(c(1)-1.25)\approx15\%$ of the gap between the matched Petz map and the optimum. It helps more at stronger noise: at $\gamma=0.3$ it raises $F$ from $0.849$ to $0.867$, against $F_{\mathrm{opt}}=0.890$, which closes $44\%$ of the gap. The constant $1.25$ is a numerical observation, not part of the theorem.
 
-\paragraph{Practical message and limitations.} If the damping rate is uncertain, it is better to err on the low side: at weak noise, any factor between $0$ and $1$ helps and the factor $\frac12$ is optimal. The guess should never be set to zero, though. The result is asymptotic in $\gamma$, and the optimality statement holds for $r$ in a compact interval; the numerics indicate that the global optimum also tends to $\frac12$. The structural argument of Steps~3 and~5 (orthogonal syndromes, and single decays corrected for any $h>0$) does not rely on the details of the Leung code and should carry over to other codes for amplitude damping.
+
+\needspace{6\baselineskip}
+\paragraph{Practical message and limitations.} For sufficiently weak amplitude damping and a fixed relative calibration $h=r\gamma$, choosing $0<r<1$ improves the leading-order fidelity compared with matched Petz recovery, and the ratio $\frac12$ is optimal. The guess should never be set to zero, though. Theorem~\ref{thm:main} is asymptotic: it describes the regime $\gamma\to0$. At finite $\gamma$ the higher orders matter: the optimal ratio drifts below $\frac12$.
 
 %======================================================================
 \appendix
@@ -398,10 +381,14 @@ The remainder in \eqref{eq:Fexact} is
 \]
 At $h=r\gamma$ every term of $\rho$ is of order $\gamma^4$ or smaller, since $T_{0011,1100}$, $T_{0000,1111}$ and $T_{1111,0000}$ are $O(\gamma^2)$, $T_{1111,1111}=O(\gamma^3)$ and $T_{(3)}=O(\gamma^{5/2})$.
 
+\section*{Acknowledgements}
+An AI assistant (Claude, Anthropic) was used to assist with the extensive computations. The outline of the proof and research direction were developed by the author. The resulting mathematical identities were checked using symbolic and numerical computations.
+
 \begin{thebibliography}{9}
 \bibitem{barnum2002} H.~Barnum and E.~Knill, \emph{Reversing quantum dynamics with near-optimal quantum and classical fidelity}, J. Math. Phys. \textbf{43}, 2097 (2002).
 \bibitem{leung1997} D.~W. Leung, M.~A. Nielsen, I.~L. Chuang and Y.~Yamamoto, \emph{Approximate quantum error correction can lead to better codes}, Phys. Rev. A \textbf{56}, 2567 (1997).
 \bibitem{fletcher2007} A.~S. Fletcher, P.~W. Shor and M.~Z. Win, \emph{Optimum quantum error recovery using semidefinite programming}, Phys. Rev. A \textbf{75}, 012338 (2007).
+\bibitem{burri2026} L.~Burri, \emph{Entanglement fidelity of the Petz decoder for one-shot entanglement transmission}, J. Math. Phys. \textbf{67}, 102203 (2026).
 \end{thebibliography}
 
 \end{document}

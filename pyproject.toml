@@ -1,9 +1,14 @@
 [project]
 name = "qec-optimal-recovery"
-version = "0.1.0"
-description = "Petz vs. SDP-optimal recovery for the LNCY code under amplitude damping"
+version = "0.2.0"
+description = "Petz, SDP-optimal and mismatched Petz recovery for the LNCY code under amplitude damping"
+readme = "README.md"
+authors = [{ name = "Pierre Levilion" }]
 requires-python = ">=3.10"
 dependencies = ["numpy", "scipy", "matplotlib", "cvxpy"]
+
+[project.urls]
+Repository = "https://github.com/plevilion/qec-optimal-recovery"
 
 [project.optional-dependencies]
 dev = ["pytest", "jupyter"]
